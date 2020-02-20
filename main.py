@@ -4,6 +4,7 @@ from google.appengine.api import users
 import os
 from google.appengine.ext import ndb
 from evdatabase import EvDatabase
+from evdatabase import Review
 from datetime import datetime
 
 class MainPage(webapp2.RequestHandler):
@@ -144,6 +145,7 @@ class AddVehicle(webapp2.RequestHandler):
 			evdatabase.put()
 			self.redirect('/dashboard')
 
+
 class ShowVehicle(webapp2.RequestHandler):
 	def get(self, ev_id):
 		self.response.headers['Content-Type'] = 'text/html'
@@ -157,11 +159,26 @@ class ShowVehicle(webapp2.RequestHandler):
 			url = users.create_login_url(self.request.uri)
 			url_string = 'login'
 		evs = EvDatabase.get_by_id(int(ev_id))
+		reviews = Review.query(Review.carkey==evs.carkey).order(-Review.date).fetch()
+		review_count = Review.query(Review.carkey==evs.carkey)
+		count = review_count.count()
+		average_score = 0.0
+		if count is not 0:
+			for review in reviews:
+				average_score = average_score + review.rating
+			average_score = round(average_score/count, 2)
+			evs.average_score = average_score
+			evs.put()
+		average_score_int = int(average_score)
 		template_values = {
 			'url':url,
 			'url_string':url_string,
 			'user':user,
 			'evs':evs,
+			'reviews':reviews,
+			'count':count,
+			'average_score':average_score,
+			'average_score_int':average_score_int,
 		}
 		template = JINJA_ENVIROMENT.get_template('show-vehicle.html')
 		self.response.write(template.render(template_values))
@@ -269,12 +286,12 @@ class CompareVehicle(webapp2.RequestHandler):
 			cost_list.append(ev.cost)
 			power_list.append(ev.power)
 
-
 		template_values = {
 			'url':url,
 			'url_string':url_string,
 			'user':user,
 			'evs':evs,
+			'highest_year':highest_year,
 		}
 		template = JINJA_ENVIROMENT.get_template('compare-vehicles.html')
 		self.response.write(template.render(template_values))
