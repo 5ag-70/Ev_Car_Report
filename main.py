@@ -2,6 +2,7 @@ import webapp2
 import jinja2
 from google.appengine.api import users
 import os
+
 from google.appengine.ext import ndb
 from evdatabase import EvDatabase
 from evdatabase import Review
@@ -146,6 +147,7 @@ class AddVehicle(webapp2.RequestHandler):
 			self.redirect('/dashboard')
 
 
+
 class ShowVehicle(webapp2.RequestHandler):
 	def get(self, ev_id):
 		self.response.headers['Content-Type'] = 'text/html'
@@ -279,19 +281,43 @@ class CompareVehicle(webapp2.RequestHandler):
 		range_list = []
 		cost_list = []
 		power_list = []
+		average_score_list = []
 		for ev in evs:
 			year_list.append(ev.year)
 			battery_size_list.append(ev.battery_size)
 			range_list.append(ev.range)
 			cost_list.append(ev.cost)
 			power_list.append(ev.power)
-
+			average_score_list.append(ev.average_score)
+		highest_year = max(year_list)
+		lowest_year = min(year_list)
+		highest_battery_size = max(battery_size_list)
+		lowest_battery_size = min(battery_size_list)
+		highest_range = max(range_list)
+		lowest_range = min(range_list)
+		highest_cost = max(cost_list)
+		lowest_cost = min(cost_list)
+		highest_power = max(power_list)
+		lowest_power = min(power_list)
+		highest_average_score = max(average_score_list)
+		lowest_average_score = min(average_score_list)
 		template_values = {
 			'url':url,
 			'url_string':url_string,
 			'user':user,
 			'evs':evs,
 			'highest_year':highest_year,
+			'lowest_year':lowest_year,
+			'highest_battery_size':highest_battery_size,
+			'lowest_battery_size':lowest_battery_size,
+			'highest_range':highest_range,
+			'lowest_range':lowest_range,
+			'highest_cost':highest_cost,
+			'lowest_cost':lowest_cost,
+			'highest_power':highest_power,
+			'lowest_power':lowest_power,
+			'highest_average_score':highest_average_score,
+			'lowest_average_score':lowest_average_score,
 		}
 		template = JINJA_ENVIROMENT.get_template('compare-vehicles.html')
 		self.response.write(template.render(template_values))
@@ -310,4 +336,5 @@ app = webapp2.WSGIApplication([
 	('/edit/(.*)', EditVehicle),
 	('/delete/(.*)', DeleteVehicle),
 	('/compare/(.*)', CompareVehicle),
+	
 ], debug=True)
