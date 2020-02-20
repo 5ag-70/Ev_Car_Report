@@ -1,0 +1,95 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<title>User login/logout></title>
+	</head>
+	<body>
+		<div class="col-lg-4 mb-0">
+			<a href="/"><img src="/images/evlogo.png"></a>
+		</div>
+		<div style="padding:20px;" class="col-lg-8 mb-0">
+		{% if not user %}
+			<div class="col-lg-4 mb-0">
+				<p>Welcome to EV database please login first before adding EV to database</p>
+			</div>
+			<div class="col-lg-4 mb-0"><input type="button" onclick="window.location.href = '{{url}}';" value={{url_string}}>
+			</div>
+		{% endif %}
+		</div>
+		<div style="padding:50px;" class="col-lg-12">
+		<div class="col-lg-12">
+                                <table class="table table-hover">
+									<thead>  
+										<tr>   
+											<th>Name</th> 
+											<th>Manufacturer</th>  
+											<th>Year</th>  
+											<th>Battery size</th>  
+											<th>WLTP range</th>  
+											<th>Cost</th> 
+											<th>Power</th> 
+											<th>Average score</th> 
+										</tr>  
+									</thead>  
+									<tbody>  
+									{% for ev in evs %}  
+										<tr>  
+											<td onclick="window.location.assign('/show/{{ev.key.id()}}');">{{ ev.name }}</td>  
+											<td>{{ ev.manufacturer }}</td>  
+											{% if ev.year == highest_year %}
+											<td style="color:#00ff00">{{ ev.year }}</td> 
+											{% elif ev.year == lowest_year %}
+											<td style="color:#ff0000">{{ ev.year }}</td> 
+											{% else %}
+											<td>{{ ev.year }}</td> 
+											{% endif %}
+											{% if ev.battery_size == highest_battery_size %}
+											<td style="color:#00ff00">{{ ev.battery_size }}</td> 
+											{% elif ev.battery_size == lowest_battery_size %}
+											<td style="color:#ff0000">{{ ev.battery_size }}</td> 
+											{% else %}
+											<td>{{ ev.battery_size }}</td> 
+											{% endif %}
+											{% if ev.range == highest_range %}
+											<td style="color:#00ff00">{{ ev.range }}</td> 
+											{% elif ev.range == lowest_range %}
+											<td style="color:#ff0000">{{ ev.range }}</td> 
+											{% else %}
+											<td>{{ ev.range }}</td> 
+											{% endif %}
+											{% if ev.cost == highest_cost %}
+											<td style="color:#ff0000">{{ ev.cost }}</td> 
+											{% elif ev.cost == lowest_cost %}
+											<td style="color:#00ff00">{{ ev.cost }}</td> 
+											{% else %}
+											<td>{{ ev.cost }}</td> 
+											{% endif %}
+											{% if ev.power == highest_power %}
+											<td style="color:#00ff00">{{ ev.power }}</td> 
+											{% elif ev.power == lowest_power %}
+											<td style="color:#ff0000">{{ ev.power }}</td> 
+											{% else %}
+											<td>{{ ev.power }}</td> 
+											{% endif %}
+											{% if ev.average_score == None %}
+												<td>no review yet</td>
+											{% else %}
+											{% if ev.average_score == highest_average_score %}
+											<td style="color:#00ff00">{{ ev.average_score }}</td> 
+											{% elif ev.year == lowest_year %}
+											<td style="color:#ff0000">{{ ev.average_score }}</td> 
+											{% else %}
+											<td>{{ ev.average_score }}</td> 
+											{% endif %}   
+											{% endif %}   
+										</tr>  
+									{% endfor %}  
+									</tbody> 
+                                </table>
+		</div>
+		<div class="col-lg-6">
+		</div>
+		</div>
+	</body>
+</html>

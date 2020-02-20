@@ -1,0 +1,164 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+		<title>EV Database></title>
+	</head>
+	<body>
+		<div class="col-lg-4 mb-0">
+			<a href="/"><img src="/images/evlogo.png"></a>
+		</div>
+		<div style="padding:20px;" class="col-lg-4 mb-0">
+		{% if user %}
+		<p><a href="/add">Add new Ev to database</a></p>
+		{% endif %}
+		</div>
+		<div style="padding:20px;" class="col-lg-4 mb-0">
+		{% if user %}
+			<div class="col-lg-8 mb-0">
+				<p>Hi, {{user.email()}}</p>
+			</div>
+		{% else %}
+			<div class="col-lg-8 mb-0">
+				<p>Welcome to EV database</p>
+			</div>
+		{% endif %}
+			<div class="col-lg-4 mb-0"><input type="button" onclick="window.location.href = '{{url}}';" value={{url_string}}>
+			</div>
+		</div>
+                <!-- EV in db -->
+                <div class="col-lg-12">
+                    <div>
+                        <div class="col-lg-4">
+                            <h2>EV in database</h2>
+                        </div>
+					{% if search_string %}
+                        <div id="div_search_string" class="col-lg-8">
+                            <h2>{{search_string}}<a href="/"><span style="color:#ff0000;" class="glyphicon glyphicon-remove"></span></a></h2>
+                        </div>
+					{% else %}
+						<div id="div_search_form" style="padding-top:25px;" class="col-lg-8">
+							<form method="POST" action="/dashboard">
+								<div id="div_start" class="col-lg-3">
+									<input type="number" placeholder="start range" id="start" name="start"><br>
+								</div>
+								<div id="div_end" class="col-lg-3">
+									<input type="number" placeholder="end range" id="end" name="end"><br>
+								</div>
+								<div id="div_search" class="col-lg-3">
+									<input type="text" placeholder="search ev" id="search" name="search"><br>
+								</div>
+								<div class="col-lg-3">
+									<select id="ev_data" name="ev_data" onchange="getSelected()">
+										<option value="name">Name</option>
+										<option value="manufacturer">Manufacturer</option>
+										<option value="year">Year</option>
+										<option value="battery_size">Battery size</option>
+										<option value="range">WLTP range</option>
+										<option value="cost">Cost</option>
+										<option value="power">Power</option>
+									</select>
+								</div>
+								<div class="col-lg-1">
+									<input type="submit" id="query" name="query" value="search"><br>
+								</div>
+							</form>
+								<div id="div_compare" class="col-lg-1">
+									<input type="submit" id="compare" name="compare" value="compare" onclick="Compare()"><br>
+								</div>
+						</div>
+					{% endif %}
+                        <div>
+                            <div>
+                                <table class="table table-hover">
+									<thead>  
+										<tr>   
+											<th>Select</th> 
+											<th>Name</th> 
+											<th>Manufacturer</th>  
+											<th>Year</th>  
+											<th>Battery size</th>  
+											<th>WLTP range</th>  
+											<th>Cost</th> 
+											<th>Power</th> 
+										</tr>  
+									</thead>  
+									<tbody> 
+									{% for ev in evs %}  
+										<tr>  
+											<td><div class="checkbox-inline"><label><input type="checkbox" value="{{ev.key.id()}}"></label></div></td>  
+											<td onclick="window.location.assign('/show/{{ev.key.id()}}');">{{ ev.name }}</td>  
+											<td onclick="window.location.assign('/show/{{ev.key.id()}}');">{{ ev.manufacturer }}</td>
+											<td onclick="window.location.assign('/show/{{ev.key.id()}}');">{{ ev.year }}</td> 
+											<td onclick="window.location.assign('/show/{{ev.key.id()}}');">{{ ev.battery_size }}</td>      
+											<td onclick="window.location.assign('/show/{{ev.key.id()}}');">{{ ev.range }}</td>  
+											<td onclick="window.location.assign('/show/{{ev.key.id()}}');">{{ ev.cost }}</td>
+											<td onclick="window.location.assign('/show/{{ev.key.id()}}');">{{ ev.power }}</td>  
+										</tr>  
+									{% endfor %}  
+									</tbody> 
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+	</body>
+
+<script>
+var c = 0;
+var cars = [];
+document.getElementById("div_start").style.display = "none";
+document.getElementById("div_end").style.display = "none";
+document.getElementById("div_compare").style.display = "none";
+document.getElementById("div_search").style.display = "block";
+document.getElementById("search").required = true;
+function getSelected(){
+var selected = document.getElementById('ev_data');
+if(selected.value == "name" || selected.value == "manufacturer"){
+document.getElementById("div_start").style.display = "none";
+document.getElementById("start").required = false;
+document.getElementById("div_end").style.display = "none";
+document.getElementById("end").required = false;
+document.getElementById("div_search").style.display = "block";
+document.getElementById("search").required = true;
+}
+else{
+document.getElementById("div_start").style.display = "block";
+document.getElementById("start").required = true;
+document.getElementById("div_end").style.display = "block";
+document.getElementById("end").required = true;
+document.getElementById("div_search").style.display = "none";
+document.getElementById("search").required = false;
+}
+}
+$(document).ready(function(){
+	$('input[type="checkbox"]').click(function(){
+		if($(this).prop("checked") == true){
+			var value = $(this).val();
+			cars.push(value);
+			c++;
+		}
+		else if($(this).prop("checked") == false){
+			var value = $(this).val();
+			var index = cars.indexOf(value)
+			cars.splice(index, 1);
+			c--;
+		}
+		if(c>1)
+			document.getElementById("div_compare").style.display = "block";
+		else
+			document.getElementById("div_compare").style.display = "none";
+	});
+});
+function arrayRemove(arr, value){
+	return arr.filter(function(ele){
+		return ele != value;
+	});
+}
+function Compare(){
+	var data = JSON.stringify(cars);
+	window.location.href = '/compare/'+data;
+}
+</script>
+</html>

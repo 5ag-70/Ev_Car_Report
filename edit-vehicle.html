@@ -1,0 +1,46 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<title>User login/logout></title>
+	</head>
+	<body>
+		<div class="col-lg-4 mb-0">
+			<a href="/"><img src="/images/evlogo.png"></a>
+		</div>
+		{% if user == evs.created_by%}
+		
+		<div class="col-lg-4 mb-0">
+		<form method="POST" action="/edit/{{evs.key.id()}}">
+			<br>
+			<br>
+			<br>
+			<label for="vname">Vehicle name:</label><br>
+			<input type="text" id="vname" name="vname" value={{evs.name}} required><br>
+			<label for="manufacturer">Manufacturer:</label><br>
+			<input type="text" id="manufacturer" name="manufacturer" value={{evs.manufacturer}} required><br>
+			<label for="year">Year:</label><br>
+			<input type="number" id="year" name="year" value={{evs.year}} required><br>
+			<label for="bsize">Battery size:</label><br>
+			<input type="number" id="bsize" name="bsize" value={{evs.battery_size}} required><br>
+			<label for="range">Range:</label><br>
+			<input type="number" id="range" name="range" value={{evs.range}} required><br>
+			<label for="cost">Cost:</label><br>
+			<input type="number" id="cost" name="cost" value={{evs.cost}} required><br>
+			<label for="power">Power:</label><br>
+			<input type="number" id="power" name="power" value={{evs.power}} required><br>
+			<button style="margin-top: 20px;" type="submit" class="btn btn-primary">Update</button>
+		</form>
+		</div>
+		{% endif %}
+		<div style="padding:20px;" class="col-lg-8 mb-0">
+		{% if not user %}
+			<div class="col-lg-4 mb-0">
+				<p>Welcome to EV database please login first before adding EV to database</p>
+			</div>
+			<div class="col-lg-4 mb-0"><input type="button" onclick="window.location.href = '{{url}}';" value={{url_string}}>
+			</div>
+		{% endif %}
+		</div>
+	</body>
+</html>

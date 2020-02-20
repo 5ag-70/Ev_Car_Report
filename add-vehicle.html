@@ -1,0 +1,95 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<title>User login/logout></title>
+	</head>
+	<body style="align: center;">
+		<div class="col-lg-4 mb-0">
+			<a href="/"><img src="/images/evlogo.png"></a>
+		</div>
+		{% if user %}
+		
+		<div class="col-lg-4 mb-0">
+		<form onsubmit="return checkev()" method="POST" action="/add">
+			<br>
+			<br>
+			<br>
+			<label for="vname">Vehicle name:</label><br>
+			<input type="text" id="vname" name="vname" required><br>
+			<label for="manufacturer">Manufacturer:</label><br>
+			<input type="text" id="manufacturer" name="manufacturer" required><br>
+			<label for="year">Year:</label><br>
+			<input type="number" id="year" name="year" required><br>
+			<label for="bsize">Battery size:</label><br>
+			<input type="number" id="bsize" name="bsize" required><br>
+			<label for="range">Range:</label><br>
+			<input type="number" id="range" name="range" required><br>
+			<label for="cost">Cost:</label><br>
+			<input type="number" id="cost" name="cost" required><br>
+			<label for="power">Power:</label><br>
+			<input type="number" id="power" name="power" required><br>
+			<button style="margin-top: 20px;" type="submit" class="btn btn-primary">Submit</button>
+			<h1>{{error_string}}<h1>
+		</form>
+		</div>
+		{% endif %}
+		<div style="padding:20px;" class="col-lg-8 mb-0">
+		{% if not user %}
+			<div class="col-lg-4 mb-0">
+				<p>Welcome to EV database please login first before adding EV to database</p>
+			</div>
+			<div class="col-lg-4 mb-0"><input type="button" onclick="window.location.href = '{{url}}';" value={{url_string}}>
+			</div>
+		{% endif %}
+		</div>
+	</body>
+
+<script>
+				
+function checkev() {
+
+	var name = $("#vname").val();
+	var manufacturer = $("#manufacturer").val();
+	var year = $("#year").val();
+	evexist = true;
+	$.ajax({
+		async:false,
+		url : "/get_ev/",
+
+		data : {
+
+			"name":name,
+			"manufacturer":manufacturer,
+			"year":year,
+
+		},
+
+		type: "POST",
+
+
+		success : function (data) {
+
+			//console.log(data);
+
+			if (data.ev_exist) {
+				alert("Ev already exist");
+				evexist = true;
+			} else {
+				evexist = false;
+			}
+		}
+	});
+			if(evexist){
+				return false;
+			}
+			else{
+				return true;
+			}
+
+}
+</script>
+
+</html>
