@@ -1,12 +1,7 @@
 import webapp2
 import jinja2
 from google.appengine.api import users
-import os
-import json
-from google.appengine.ext import ndb
-from evdatabase import EvDatabase
-from evdatabase import Review
-from datetime import datetime
+
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
@@ -36,11 +31,5 @@ JINJA_ENVIROMENT = jinja2.Environment(
 
 app = webapp2.WSGIApplication([
 	('/', MainPage),
-	('/dashboard', Dashboard),
-	('/add', AddVehicle),
-	('/show/(.*)', ShowVehicle),
-	('/edit/(.*)', EditVehicle),
-	('/delete/(.*)', DeleteVehicle),
-	('/compare/(.*)', CompareVehicle),
-	('/get_ev/$', CheckDuplicateEv),
+
 ], debug=True)

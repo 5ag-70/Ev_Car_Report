@@ -12,10 +12,3 @@ class EvDatabase(ndb.Model):
 	average_score = ndb.FloatProperty()
 	carkey = ndb.StringProperty()
 	date = ndb.DateTimeProperty()
-	
-class Review(ndb.Model):
-	created_by = ndb.UserProperty()
-	review = ndb.StringProperty()
-	rating = ndb.IntegerProperty()
-	date = ndb.DateTimeProperty()
-	carkey = ndb.StringProperty()
