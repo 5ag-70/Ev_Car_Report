@@ -144,6 +144,100 @@ class AddVehicle(webapp2.RequestHandler):
 			evdatabase.put()
 			self.redirect('/dashboard')
 
+class ShowVehicle(webapp2.RequestHandler):
+	def get(self, ev_id):
+		self.response.headers['Content-Type'] = 'text/html'
+		user = users.get_current_user()
+		url = ''
+		url_string = ''
+		if user:
+			url = users.create_logout_url(self.request.uri)
+			url_string = 'logout'
+		else:
+			url = users.create_login_url(self.request.uri)
+			url_string = 'login'
+		evs = EvDatabase.get_by_id(int(ev_id))
+
+		template_values = {
+			'url':url,
+			'url_string':url_string,
+			'user':user,
+			'evs':evs,
+		}
+		template = JINJA_ENVIROMENT.get_template('show-vehicle.html')
+		self.response.write(template.render(template_values))
+
+	def post(self, ev_id):
+		request = self.request.POST
+		user = users.get_current_user()
+		created_by = user
+		review = request['review']
+		rating = int(request['rating'])
+		date = datetime.now()
+		carkey = request['carkey']
+		ev_id = request['ev_id']
+		carreview = Review(created_by=created_by,
+								review=review,
+								rating=rating,
+								date=date,
+								carkey=carkey)
+		carreview.put()
+		self.redirect('/show/'+ev_id)
+
+class EditVehicle(webapp2.RequestHandler):
+	def get(self, ev_id):
+		self.response.headers['Content-Type'] = 'text/html'
+		url = ''
+		url_string = ''
+		user = users.get_current_user()
+		if user:
+			url = users.create_logout_url(self.request.uri)
+			url_string = 'logout'
+		else:
+			url = users.create_login_url(self.request.uri)
+			url_string = 'login'
+		evs = EvDatabase.get_by_id(int(ev_id))
+		template_values = {
+			'url':url,
+			'url_string':url_string,
+			'user':user,
+			'evs':evs
+		}
+		template = JINJA_ENVIROMENT.get_template('edit-vehicle.html')
+		self.response.write(template.render(template_values))
+
+	def post(self, ev_id):
+		request = self.request.POST
+		evdatabase = EvDatabase.get_by_id(int(ev_id))
+		name = request['vname'].strip().capitalize()
+		manufacturer = request['manufacturer'].strip().capitalize()
+		year = int(request['year'])
+		battery_size = int(request['bsize'])
+		range = int(request['range'])
+		cost = int(request['cost'])
+		power = int(request['power'])
+		evdatabase.name=name
+		evdatabase.manufacturer=manufacturer
+		evdatabase.year=year
+		evdatabase.battery_size=battery_size
+		evdatabase.range=range
+		evdatabase.cost=cost
+		evdatabase.power=power
+		evdatabase.put()
+		self.redirect('/show/'+ev_id)
+
+
+class DeleteVehicle(webapp2.RequestHandler):
+	def get(self, ev_id):
+		evdatabase = EvDatabase.get_by_id(int(ev_id))
+		evdatabase.key.delete()
+		reviews = Review.query(Review.carkey == evdatabase.carkey).fetch()
+		for review in reviews:
+			if review is not None:
+				review.key.delete()
+		self.redirect('/dashboard')
+
+
 
 JINJA_ENVIROMENT = jinja2.Environment(
 	loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -155,5 +249,7 @@ app = webapp2.WSGIApplication([
 	('/', MainPage),
 	('/dashboard', Dashboard),
 	('/add', AddVehicle),
-
+	('/show/(.*)', ShowVehicle),
+	('/edit/(.*)', EditVehicle),
+	('/delete/(.*)', DeleteVehicle),
 ], debug=True)
