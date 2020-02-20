@@ -157,7 +157,6 @@ class ShowVehicle(webapp2.RequestHandler):
 			url = users.create_login_url(self.request.uri)
 			url_string = 'login'
 		evs = EvDatabase.get_by_id(int(ev_id))
-
 		template_values = {
 			'url':url,
 			'url_string':url_string,
@@ -237,7 +236,48 @@ class DeleteVehicle(webapp2.RequestHandler):
 				review.key.delete()
 		self.redirect('/dashboard')
 
+class CompareVehicle(webapp2.RequestHandler):
+	def get(self, data):
+		self.response.headers['Content-Type'] = 'text/html'
+		url = ''
+		url_string = ''
+		user = users.get_current_user()
+		if user:
+			url = users.create_logout_url(self.request.uri)
+			url_string = 'logout'
+		else:
+			url = users.create_login_url(self.request.uri)
+			url_string = 'login'
+		try:
+			import simplejson as json
+		except(ImportError,):
+			import json
+		comparedata = json.loads(data)
+		evs = []
+		for data in comparedata:
+			ev_data = EvDatabase.get_by_id(int(data))
+			evs.append(ev_data)
+		year_list = []
+		battery_size_list = []
+		range_list = []
+		cost_list = []
+		power_list = []
+		for ev in evs:
+			year_list.append(ev.year)
+			battery_size_list.append(ev.battery_size)
+			range_list.append(ev.range)
+			cost_list.append(ev.cost)
+			power_list.append(ev.power)
 
+
+		template_values = {
+			'url':url,
+			'url_string':url_string,
+			'user':user,
+			'evs':evs,
+		}
+		template = JINJA_ENVIROMENT.get_template('compare-vehicles.html')
+		self.response.write(template.render(template_values))
 
 JINJA_ENVIROMENT = jinja2.Environment(
 	loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -252,4 +292,5 @@ app = webapp2.WSGIApplication([
 	('/show/(.*)', ShowVehicle),
 	('/edit/(.*)', EditVehicle),
 	('/delete/(.*)', DeleteVehicle),
+	('/compare/(.*)', CompareVehicle),
 ], debug=True)
