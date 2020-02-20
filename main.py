@@ -2,7 +2,7 @@ import webapp2
 import jinja2
 from google.appengine.api import users
 import os
-
+import json
 from google.appengine.ext import ndb
 from evdatabase import EvDatabase
 from evdatabase import Review
@@ -146,7 +146,21 @@ class AddVehicle(webapp2.RequestHandler):
 			evdatabase.put()
 			self.redirect('/dashboard')
 
-
+class CheckDuplicateEv(webapp2.RequestHandler):
+	def post(self):
+		response_data = {}
+		request = self.request.POST
+		name = request['name'].strip().capitalize()
+		manufacturer = request['manufacturer'].strip().capitalize()
+		year = request['year']
+		car_key = manufacturer+name+year
+		evexist = EvDatabase.query(EvDatabase.carkey==car_key).get()
+		if evexist == None:
+			response_data["ev_exist"] = False
+		else:
+			response_data["ev_exist"] = True
+		self.response.headers['Content-Type'] = 'application/json'
+		return self.response.out.write(json.dumps(response_data))
 
 class ShowVehicle(webapp2.RequestHandler):
 	def get(self, ev_id):
@@ -336,5 +350,5 @@ app = webapp2.WSGIApplication([
 	('/edit/(.*)', EditVehicle),
 	('/delete/(.*)', DeleteVehicle),
 	('/compare/(.*)', CompareVehicle),
-	
+	('/get_ev/$', CheckDuplicateEv),
 ], debug=True)
