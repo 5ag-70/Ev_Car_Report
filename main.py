@@ -25,7 +25,7 @@ class MainPage(webapp2.RequestHandler):
 			self.response.write(template.render(template_values))
 		else:
 			self.redirect('/dashboard')
-
+	
 class Dashboard(webapp2.RequestHandler):
 	def get(self):
 		self.response.headers['Content-Type'] = 'text/html'
@@ -47,9 +47,9 @@ class Dashboard(webapp2.RequestHandler):
 		}
 		template = JINJA_ENVIROMENT.get_template('dashboard.html')
 		self.response.write(template.render(template_values))
-
+	
 	def post(self):
-		request = self.request.POST
+		request = self.request.POST	
 		search_string = ''
 		if not (request['start']) == '':
 			start = request['start']
@@ -97,7 +97,7 @@ class Dashboard(webapp2.RequestHandler):
 		}
 		template = JINJA_ENVIROMENT.get_template('dashboard.html')
 		self.response.write(template.render(template_values))
-
+		
 class AddVehicle(webapp2.RequestHandler):
 	def get(self):
 		self.response.headers['Content-Type'] = 'text/html'
@@ -117,9 +117,9 @@ class AddVehicle(webapp2.RequestHandler):
 		}
 		template = JINJA_ENVIROMENT.get_template('add-vehicle.html')
 		self.response.write(template.render(template_values))
-
+		
 	def post(self):
-		request = self.request.POST
+		request = self.request.POST	
 		name = request['vname'].strip().capitalize()
 		manufacturer = request['manufacturer'].strip().capitalize()
 		year = request['year']
@@ -145,11 +145,11 @@ class AddVehicle(webapp2.RequestHandler):
 								date=date,)
 			evdatabase.put()
 			self.redirect('/dashboard')
-
+			
 class CheckDuplicateEv(webapp2.RequestHandler):
 	def post(self):
 		response_data = {}
-		request = self.request.POST
+		request = self.request.POST	
 		name = request['name'].strip().capitalize()
 		manufacturer = request['manufacturer'].strip().capitalize()
 		year = request['year']
@@ -161,7 +161,7 @@ class CheckDuplicateEv(webapp2.RequestHandler):
 			response_data["ev_exist"] = True
 		self.response.headers['Content-Type'] = 'application/json'
 		return self.response.out.write(json.dumps(response_data))
-
+	
 class ShowVehicle(webapp2.RequestHandler):
 	def get(self, ev_id):
 		self.response.headers['Content-Type'] = 'text/html'
@@ -198,9 +198,9 @@ class ShowVehicle(webapp2.RequestHandler):
 		}
 		template = JINJA_ENVIROMENT.get_template('show-vehicle.html')
 		self.response.write(template.render(template_values))
-
+		
 	def post(self, ev_id):
-		request = self.request.POST
+		request = self.request.POST	
 		user = users.get_current_user()
 		created_by = user
 		review = request['review']
@@ -215,7 +215,7 @@ class ShowVehicle(webapp2.RequestHandler):
 								carkey=carkey)
 		carreview.put()
 		self.redirect('/show/'+ev_id)
-
+	
 class EditVehicle(webapp2.RequestHandler):
 	def get(self, ev_id):
 		self.response.headers['Content-Type'] = 'text/html'
@@ -237,9 +237,9 @@ class EditVehicle(webapp2.RequestHandler):
 		}
 		template = JINJA_ENVIROMENT.get_template('edit-vehicle.html')
 		self.response.write(template.render(template_values))
-
+		
 	def post(self, ev_id):
-		request = self.request.POST
+		request = self.request.POST	
 		evdatabase = EvDatabase.get_by_id(int(ev_id))
 		name = request['vname'].strip().capitalize()
 		manufacturer = request['manufacturer'].strip().capitalize()
@@ -257,8 +257,8 @@ class EditVehicle(webapp2.RequestHandler):
 		evdatabase.power=power
 		evdatabase.put()
 		self.redirect('/show/'+ev_id)
-
-
+		
+		
 class DeleteVehicle(webapp2.RequestHandler):
 	def get(self, ev_id):
 		evdatabase = EvDatabase.get_by_id(int(ev_id))
@@ -268,7 +268,7 @@ class DeleteVehicle(webapp2.RequestHandler):
 			if review is not None:
 				review.key.delete()
 		self.redirect('/dashboard')
-
+		
 class CompareVehicle(webapp2.RequestHandler):
 	def get(self, data):
 		self.response.headers['Content-Type'] = 'text/html'
@@ -335,13 +335,13 @@ class CompareVehicle(webapp2.RequestHandler):
 		}
 		template = JINJA_ENVIROMENT.get_template('compare-vehicles.html')
 		self.response.write(template.render(template_values))
-
+		
 JINJA_ENVIROMENT = jinja2.Environment(
 	loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
 	extensions = ['jinja2.ext.autoescape'],
 	autoescape = True
 )
-
+	
 app = webapp2.WSGIApplication([
 	('/', MainPage),
 	('/dashboard', Dashboard),
